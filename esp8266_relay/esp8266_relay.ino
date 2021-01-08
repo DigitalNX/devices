@@ -1,14 +1,13 @@
 #include <ESP8266WiFi.h>
 
 const char *ssid = "<SSID>";
-const char *password = "<PASSWORD";
+const char *password = "<PWD>";
 
 // defining pin numbers
 const int relayPin = 5;
 const int switchPin = 2;
 
 bool currentState = true;
-bool lastTime = true;
 
 WiFiServer server(80);
 
@@ -33,7 +32,7 @@ void setup() {
   // connecting to WiFi network
   connect_to_wifi();
 
-  // start the server
+  // starting the server
   run_server();
 }
 
@@ -48,14 +47,10 @@ void loop() {
     WiFiClient client = server.available();
     if (!client) {
       if (digitalRead(switchPin) ==  LOW) {
-        if (lastTime == true) {
-          lastTime = false;
+        if (currentState == false) {
           changeState();
         }
-      } else {
-        lastTime = true;
       }
-
       return;
     }
     // wait until the client sends some data
