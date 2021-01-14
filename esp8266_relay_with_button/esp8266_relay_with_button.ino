@@ -1,12 +1,11 @@
-#include <dummy.h>
-
 #include <ESP8266WiFi.h>
 
 const char *ssid = "<SSID>";
 const char *password = "<PWD>";
 
 // defining pin numbers
-const int relayPin = 0;
+const int relayPin = 2;
+
 bool currentState = true;
 
 WiFiServer server(80);
@@ -26,8 +25,7 @@ void changeState() {
 void setup() {
   Serial.begin(9600);
   delay(10);
-  pinMode(0, OUTPUT);
-
+  pinMode(relayPin, OUTPUT);
 
   // connecting to WiFi network
   connect_to_wifi();
@@ -46,9 +44,12 @@ void loop() {
     // check if a client has connected
     WiFiClient client = server.available();
     if (!client) {
+      if (currentState == false) {
+        changeState();
+      }
+
       return;
     }
-    
     // wait until the client sends some data
     Serial.println("new client");
     while (!client.available()) {
@@ -60,12 +61,12 @@ void loop() {
     client.flush();
 
     if (request.indexOf("/RELAY=OFF") != -1) {
-      digitalWrite(0, LOW);
+      digitalWrite(relayPin, HIGH);
       currentState = false;
     }
 
     if (request.indexOf("/RELAY=ON") != -1) {
-      digitalWrite(0, HIGH);
+      digitalWrite(relayPin, LOW);
       currentState = true;
     }
 
